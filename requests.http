@@ -1,0 +1,38 @@
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "email": "example@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "birthDate": "1985-01-01",
+  "address": "123 Street, City",
+  "phoneNumber": "1234567890"
+}
+
+###
+PUT http://localhost:8080/users/7
+Content-Type: application/json
+
+{
+  "email": "mary@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "birthDate": "1983-01-01",
+  "address": "123 Street, City",
+  "phoneNumber": "1234567890"
+}
+
+###
+PATCH http://localhost:8080/users/7
+Content-Type: application/json
+
+{
+  "birthDate": "1993-01-05"
+}
+
+###
+DELETE http://localhost:8080/users/8
+
+###
+GET http://localhost:8080/users/search?from=1983-01-01&to=1983-01-10
