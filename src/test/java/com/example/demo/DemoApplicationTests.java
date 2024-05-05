@@ -5,7 +5,7 @@ import com.example.demo.exceptions.InvalidAgeException;
 import com.example.demo.exceptions.UserNotFoundException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.services.UserService;
+import com.example.demo.services.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,7 +31,7 @@ class UserServiceTest {
     private ModelMapper modelMapper;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
     @Mock
     private Environment environment;
 
