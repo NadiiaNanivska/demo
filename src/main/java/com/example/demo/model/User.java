@@ -31,7 +31,6 @@ public class User {
     @NotNull
     @Past
     private LocalDate birthDate;
-    // Completed years as of the database's current date; no stored age column.
     @Setter(AccessLevel.NONE)
     @Formula("""
             extract(year from current_date) - extract(year from birth_date)

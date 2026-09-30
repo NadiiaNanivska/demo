@@ -25,7 +25,6 @@ public final class UserFilter {
             return (root, query, builder) -> null;
         }
         try {
-            // Check exact selectors too: a per-entity whitelist alone can allow nested traversal.
             if (filter.length() > 2048 || !FIELDS.containsAll(RSQLJPASupport.toMultiValueMap(filter).keySet())) {
                 throw new InvalidUserSearchException();
             }
@@ -41,8 +40,6 @@ public final class UserFilter {
             try {
                 return specification.toPredicate(root, query, builder);
             } catch (RuntimeException ex) {
-                // Conversion and selector validation happen lazily during predicate construction.
-                // Database execution errors are intentionally outside this catch.
                 throw new InvalidUserSearchException();
             }
         };

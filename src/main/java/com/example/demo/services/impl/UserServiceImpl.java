@@ -91,7 +91,6 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(UserValidationConstants.INVALID_CREDENTIALS));
         applyUpdatesToUser(existingUser, updates);
-        // A PATCH body is a map: validate the complete resulting DTO explicitly.
         var violations = validator.validate(modelMapper.map(existingUser, UserDto.class));
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);

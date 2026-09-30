@@ -16,7 +16,6 @@ public class MinimumAgeValidator implements ConstraintValidator<MinimumAge, Loca
 
     @Override
     public boolean isValid(LocalDate birthDate, ConstraintValidatorContext context) {
-        // Requiredness is handled by @NotNull, independently of the age constraint.
         if (birthDate == null) {
             return true;
         }

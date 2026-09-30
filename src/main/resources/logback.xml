@@ -25,7 +25,6 @@
         </encoder>
     </appender>
 
-    <!-- Route the existing SQL output through both appenders. -->
     <logger name="org.hibernate.SQL" level="DEBUG"/>
 
     <root level="INFO">
