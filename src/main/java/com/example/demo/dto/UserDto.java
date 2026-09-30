@@ -2,6 +2,7 @@ package com.example.demo.dto;
 
 
 import com.example.demo.constants.UserValidationConstants;
+import com.example.demo.validation.MinimumAge;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +29,7 @@ public class UserDto {
 
     @NotNull(message = UserValidationConstants.BIRTH_DATE_REQUIRED)
     @Past(message = UserValidationConstants.BIRTH_DATE_PAST)
+    @MinimumAge
     private LocalDate birthDate;
 
     private String address;

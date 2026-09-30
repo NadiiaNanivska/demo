@@ -1,6 +1,7 @@
 package com.example.demo.exceptions;
 
 import com.example.demo.dto.InformationResponse;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,14 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, String>> handleConstraintViolation(ConstraintViolationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getConstraintViolations().forEach(violation ->
+                errors.put(violation.getPropertyPath().toString(), violation.getMessage()));
+        return ResponseEntity.badRequest().body(errors);
+    }
+
     @ExceptionHandler(InvalidUserSearchException.class)
     public ResponseEntity<InformationResponse> handleInvalidUserSearch(InvalidUserSearchException ex) {
         return ResponseEntity.badRequest().body(new InformationResponse(ex.getMessage()));

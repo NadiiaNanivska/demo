@@ -49,8 +49,8 @@ RSQL parser or AST visitor.
 `User.age` is a read-only Hibernate formula for completed years as of the
 database's current date. It uses `birth_date`, adds no database column, and
 does not change the DTO. For February 29 birthdays, the formula advances age
-on March 1 in non-leap years. It is tested on H2 and PostgreSQL. It does not
-alter the existing registration/update age-validation logic. Since it is a
+on March 1 in non-leap years. It is tested on H2 and PostgreSQL. Input age
+validation also uses completed years; see [VALIDATION.md](VALIDATION.md). Since it is a
 computed expression, large age-filtered queries may need performance tuning;
 filtering directly by `birthDate` can use an ordinary date index.
 

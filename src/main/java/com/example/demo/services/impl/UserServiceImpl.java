@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import com.example.demo.services.UserService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +23,7 @@ import com.example.demo.constants.UserValidationConstants;
 
 import java.beans.PropertyDescriptor;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Map;
 
 @Service
@@ -34,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private int MIN_AGE;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final Validator validator;
 
     public UserDto register(UserDto request) {
        if (calculateAge(request.getBirthDate()) < MIN_AGE) {
@@ -79,7 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private int calculateAge(LocalDate birthDate) {
-        return LocalDate.now().minusYears(birthDate.getYear()).getYear();
+        return Period.between(birthDate, LocalDate.now()).getYears();
     }
 
     @Transactional
@@ -87,6 +91,11 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(UserValidationConstants.INVALID_CREDENTIALS));
         applyUpdatesToUser(existingUser, updates);
+        // A PATCH body is a map: validate the complete resulting DTO explicitly.
+        var violations = validator.validate(modelMapper.map(existingUser, UserDto.class));
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
         User updatedUser = userRepository.save(existingUser);
         UserDto map = modelMapper.map(updatedUser, UserDto.class);
         return map;
