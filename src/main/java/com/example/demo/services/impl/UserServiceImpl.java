@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     public void setMIN_AGE(int MIN_AGE) {
         this.MIN_AGE = MIN_AGE;
@@ -45,6 +47,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = modelMapper.map(request, User.class);
         userRepository.save(user);
+        log.info("User created: id={}", user.getId());
         return request;
     }
 
@@ -55,12 +58,14 @@ public class UserServiceImpl implements UserService {
         }
         modelMapper.map(request, user);
         userRepository.save(user);
+        log.info("User updated: id={}", id);
         return request;
     }
 
     public String delete(long id) {
         User user = getUser(id);
         userRepository.delete(user);
+        log.info("User deleted: id={}", id);
         return "User deleted successfully.";
     }
 
@@ -73,8 +78,10 @@ public class UserServiceImpl implements UserService {
             specification = specification.and((root, query, builder) ->
                     builder.between(root.get("birthDate"), from, to));
         }
-        return userRepository.findAll(specification, pageable)
+        Page<UserDto> result = userRepository.findAll(specification, pageable)
                 .map(user -> modelMapper.map(user, UserDto.class));
+        log.debug("User search completed: returned={}, total={}", result.getNumberOfElements(), result.getTotalElements());
+        return result;
     }
 
     private User getUser(long id) {
@@ -97,6 +104,7 @@ public class UserServiceImpl implements UserService {
         }
         User updatedUser = userRepository.save(existingUser);
         UserDto map = modelMapper.map(updatedUser, UserDto.class);
+        log.info("Partial user update prepared: id={}", id);
         return map;
     }
 
