@@ -6,6 +6,9 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Setter;
+import org.hibernate.annotations.Formula;
 
 import java.time.LocalDate;
 
@@ -28,6 +31,14 @@ public class User {
     @NotNull
     @Past
     private LocalDate birthDate;
+    @Setter(AccessLevel.NONE)
+    @Formula("""
+            extract(year from current_date) - extract(year from birth_date)
+            - case when extract(month from current_date) * 100 + extract(day from current_date)
+                      < extract(month from birth_date) * 100 + extract(day from birth_date)
+                   then 1 else 0 end
+            """)
+    private Integer age;
     private String address;
     private String phoneNumber;
 }

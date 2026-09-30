@@ -7,10 +7,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -25,7 +27,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAllFields(@PathVariable long id, @RequestBody UserDto user) {
+    public ResponseEntity<?> updateAllFields(@PathVariable long id, @Valid @RequestBody UserDto user) {
         return ResponseEntity.ok(userService.update(id, user));
     }
 
@@ -39,10 +41,13 @@ public class UserController {
         return ResponseEntity.ok(userService.delete(id));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<UserDto>> searchUsersByBirthDateRange(@RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-                                                                     @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-        return ResponseEntity.ok(userService.search(fromDate, toDate));
+    @GetMapping({"", "/search"})
+    public ResponseEntity<Page<UserDto>> searchUsers(
+            @RequestParam(value = "filter", required = false) String filter,
+            @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(userService.search(filter, fromDate, toDate, pageable));
     }
 
 
