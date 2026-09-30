@@ -4,6 +4,11 @@ import com.example.demo.exceptions.InvalidAgeException;
 import com.example.demo.exceptions.UserNotFoundException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.UserFilter;
+import com.example.demo.exceptions.InvalidUserSearchException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import com.example.demo.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +21,7 @@ import com.example.demo.constants.UserValidationConstants;
 
 import java.beans.PropertyDescriptor;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,13 +60,17 @@ public class UserServiceImpl implements UserService {
         return "User deleted successfully.";
     }
 
-    public List<UserDto> search(LocalDate from, LocalDate to) {
-        if (from.isAfter(to)) {
-            throw new InvalidAgeException("Start date must be earlier than end date");
+    public Page<UserDto> search(String filter, LocalDate from, LocalDate to, Pageable pageable) {
+        if ((from == null) != (to == null) || (from != null && from.isAfter(to))) {
+            throw new InvalidUserSearchException();
         }
-        return userRepository.findAllByBirthDateBetween(from, to).stream()
-                .map(user -> modelMapper.map(user, UserDto.class))
-                .collect(Collectors.toList());
+        Specification<User> specification = UserFilter.specification(filter, pageable);
+        if (from != null) {
+            specification = specification.and((root, query, builder) ->
+                    builder.between(root.get("birthDate"), from, to));
+        }
+        return userRepository.findAll(specification, pageable)
+                .map(user -> modelMapper.map(user, UserDto.class));
     }
 
     private User getUser(long id) {

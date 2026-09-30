@@ -17,6 +17,11 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(InvalidUserSearchException.class)
+    public ResponseEntity<InformationResponse> handleInvalidUserSearch(InvalidUserSearchException ex) {
+        return ResponseEntity.badRequest().body(new InformationResponse(ex.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleHttpMessageNotReadableException(MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
